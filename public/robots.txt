@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://https-github-com-kan1112-id-chars.vercel.app/sitemap.xml
+Sitemap: https://id-chars.vercel.app/sitemap.xml
