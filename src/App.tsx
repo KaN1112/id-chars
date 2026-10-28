@@ -21,7 +21,7 @@ function IssueForm({kind}:{kind:'contact'|'request'}){
 }
 
 function Home(){
-  const [query,setQuery]=useState('');const [category,setCategory]=useState<CategoryId>('popular');const [favorites,setFavorites]=useState(loadFavorites);const [history,setHistory]=useState(loadHistory);const [notice,setNotice]=useState('');const [copied,setCopied]=useState('');const [builder,setBuilder]=useState('KaN');const [builderFeedback,setBuilderFeedback]=useState('カーソル位置に文字を追加できます');const inputRef=useRef<HTMLInputElement>(null)
+  const [query,setQuery]=useState('');const [category,setCategory]=useState<CategoryId>('popular');const [favorites,setFavorites]=useState(loadFavorites);const [history,setHistory]=useState(loadHistory);const [notice,setNotice]=useState('');const [copied,setCopied]=useState('');const [builder,setBuilder]=useState('');const [builderFeedback,setBuilderFeedback]=useState('カーソル位置に文字を追加できます');const inputRef=useRef<HTMLInputElement>(null)
   const filtered=useMemo(()=>{const normalized=query.trim().toLowerCase();return characters.filter(item=>(!query?item.category===category:[item.char,item.name,categoryLabel(item.category),...item.keywords,...codePoints(item.char)].join(' ').toLowerCase().includes(normalized)))},[query,category])
   const notify=(message:string)=>{setNotice(message);window.setTimeout(()=>setNotice(''),1800)}
   const handleCopy=async(value:string)=>{try{await copyText(value);const next=[value,...history.filter(item=>item!==value)].slice(0,30);setHistory(next);save('history',next);setCopied(value);window.setTimeout(()=>setCopied(''),1200);notify('コピーしました')}catch{notify('コピーできませんでした。長押しで選択してください')}}
