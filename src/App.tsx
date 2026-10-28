@@ -1,9 +1,8 @@
-import { useMemo,useRef,useState,type FormEvent } from 'react'
+import { useMemo,useRef,useState } from 'react'
 import { categories,characters,codePoints,convertStyles,type CategoryId,type CharacterItem } from './data'
 import { copyText,loadFavorites,loadHistory,save } from './storage'
 
 const siteName='ゲームID用特殊文字掲載サイト'
-const repositoryIssues='https://github.com/KaN1112/id-chars/issues/new'
 const categoryLabel=(id:CategoryId)=>categories.find(c=>c.id===id)?.label??id
 
 function Header(){return <header><a className="site-name" href="/">{siteName}</a><nav><a href="/#library">特殊文字一覧</a><a href="/#builder">Epic IDを作る</a><a href="/contact">お問い合わせ</a><a href="/request">文字追加申請</a></nav></header>}
@@ -16,8 +15,8 @@ function CharacterGrid({items,favorites,copied,onCopy,onFavorite}:{items:Charact
 function IssueForm({kind}:{kind:'contact'|'request'}){
   const isRequest=kind==='request'
   const [name,setName]=useState('');const [email,setEmail]=useState('');const [subject,setSubject]=useState('');const [message,setMessage]=useState('')
-  const submit=(event:FormEvent)=>{event.preventDefault();const title=isRequest?`文字追加申請：${subject||'名称未入力'}`:`お問い合わせ：${subject||'件名未入力'}`;const body=[`お名前：${name||'未入力'}`,email?`返信先：${email}`:'',isRequest?`追加したい文字：${subject}`:`件名：${subject}`,'',message].filter(Boolean).join('\n');window.location.href=`${repositoryIssues}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`}
-  return <main className="subpage"><div className="subpage-heading"><a href="/">← トップへ戻る</a><h1>{isRequest?'文字追加申請':'お問い合わせ'}</h1><p>{isRequest?'掲載してほしい特殊文字をお知らせください。確認後、重複や用途を確認して追加を検討します。':'サイトの不具合、掲載内容についてのご連絡はこちらからお願いします。'}</p></div><form className="issue-form" onSubmit={submit}><label>お名前 <span>任意</span><input value={name} onChange={event=>setName(event.target.value)} autoComplete="name"/></label><label>{isRequest?'追加したい文字・名称':'件名'} <b>必須</b><input required value={subject} onChange={event=>setSubject(event.target.value)} placeholder={isRequest?'例：！に似た文字 U+XXXX':'お問い合わせ内容の概要'}/></label><label>返信先メールアドレス <span>任意</span><input type="email" value={email} onChange={event=>setEmail(event.target.value)} autoComplete="email"/><small>公開されるGitHub Issueへ記載されます。個人情報を入力したくない場合は空欄にしてください。</small></label><label>{isRequest?'用途・参考情報':'お問い合わせ内容'} <b>必須</b><textarea required rows={7} value={message} onChange={event=>setMessage(event.target.value)} placeholder={isRequest?'文字そのもの、Unicodeコード、似ている文字、利用目的など':'できるだけ具体的にご記入ください'}/></label><div className="form-notice"><b>送信について</b><p>「GitHubで内容を確認」ボタンを押すと、このサイトのGitHub Issues作成画面へ移動します。内容を確認してから、GitHub上で送信してください。</p></div><button className="form-submit" type="submit">GitHubで内容を確認</button></form></main>
+  const endpoint=isRequest?'https://formspree.io/f/mjyywnak':'https://formspree.io/f/xnppdegq'
+  return <main className="subpage"><div className="subpage-heading"><a href="/">← トップへ戻る</a><h1>{isRequest?'文字追加申請':'お問い合わせ'}</h1><p>{isRequest?'掲載してほしい特殊文字をお知らせください。確認後、重複や用途を確認して追加を検討します。':'サイトの不具合、掲載内容についてのご連絡はこちらからお願いします。'}</p></div><form className="issue-form" action={endpoint} method="POST"><input type="hidden" name="フォーム種別" value={isRequest?'文字追加申請':'お問い合わせ'}/><label>お名前 <span>任意</span><input name="お名前" value={name} onChange={event=>setName(event.target.value)} autoComplete="name"/></label><label>{isRequest?'追加したい文字・名称':'件名'} <b>必須</b><input name={isRequest?'追加したい文字・名称':'件名'} required value={subject} onChange={event=>setSubject(event.target.value)} placeholder={isRequest?'例：！に似た文字 U+XXXX':'お問い合わせ内容の概要'}/></label><label>返信先メールアドレス <span>任意</span><input name="email" type="email" value={email} onChange={event=>setEmail(event.target.value)} autoComplete="email"/><small>返信が必要な場合のみ入力してください。</small></label><label>{isRequest?'用途・参考情報':'お問い合わせ内容'} <b>必須</b><textarea name={isRequest?'用途・参考情報':'お問い合わせ内容'} required rows={7} value={message} onChange={event=>setMessage(event.target.value)} placeholder={isRequest?'文字そのもの、Unicodeコード、似ている文字、利用目的など':'できるだけ具体的にご記入ください'}/></label><input type="text" name="_gotcha" className="form-honeypot" tabIndex={-1} autoComplete="off"/><div className="form-notice"><b>送信について</b><p>入力内容はFormspreeを経由してサイト運営者へ送信されます。内容をご確認のうえ送信してください。</p></div><button className="form-submit" type="submit">送信する</button></form></main>
 }
 
 function Home(){
